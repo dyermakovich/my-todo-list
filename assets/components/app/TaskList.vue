@@ -23,17 +23,15 @@
 <script>
 import TaskListItem from "./TaskListItem";
 import TaskListNewItem from "./TaskListNewItem";
+import axios from "axios";
+
 export default {
   name: "TaskList",
   components: {TaskListNewItem, TaskListItem},
   data() {
     return {
       currentlyEditedTask: null,
-      tasks: [
-        { id: 1, title: "Task 1" },
-        { id: 2, title: "Task 2" },
-        { id: 3, title: "Task 3" },
-      ]
+      tasks: []
     };
   },
   computed: {
@@ -54,6 +52,9 @@ export default {
         return 0;
       });
     }
+  },
+  mounted() {
+    this.loadTasks();
   },
   methods: {
     getTaskById: function(id) {
@@ -108,11 +109,36 @@ export default {
 
       return result === null ? 1 : result + 1 ;
     },
+    loadTasks: function() {
+      let self = this;
+      axios.get('/api/tasks').then(function(response){
+        console.log(response);
+
+        if(response.status === 200 && response.data) {
+          self.tasks = response.data['hydra:member'];
+        }
+
+      }).catch(function(error){
+        console.log(error);
+      })
+    },
     onEnterTask: function(event) {
       if( event ) {
-        this.tasks.push({
+        /* this.tasks.push({
           id: this.getNewId(),
           title: event.currentTarget.value
+        }); */
+
+        let self = this;
+
+        axios.post('/api/tasks', {
+          title: event.currentTarget.value
+        }).then(function(response){
+          if(response.status === 201){
+            self.loadTasks();
+          }
+        }).catch(function(error){
+          console.log(error);
         });
 
         event.currentTarget.value = "";
