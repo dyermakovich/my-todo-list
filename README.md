@@ -15,6 +15,7 @@ yarn install
 
 # Run
 
+docker-compose up<br/>
 symfony server:start<br/>
 yarn watch
 

@@ -8,7 +8,12 @@
 <script>
 export default {
   name: "TaskListNewItem",
-  emits: ["task-enter", "task-edition-stop"]
+  emits: {
+    "task-enter": ( event ) => {
+      return event && event.currentTarget && event.currentTarget.value;
+    },
+    "task-edition-stop": null
+  }
 }
 </script>
 
