@@ -10,7 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=TaskRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *     collectionOperations={"get","post"},
+ *     itemOperations={"get","delete","put"}
+ * )
  */
 class Task
 {

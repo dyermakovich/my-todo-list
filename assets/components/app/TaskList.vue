@@ -23,7 +23,7 @@
 <script>
 import TaskListItem from "./TaskListItem";
 import TaskListNewItem from "./TaskListNewItem";
-import axios from "axios";
+import api from './../../api';
 
 export default {
   name: "TaskList",
@@ -84,64 +84,32 @@ export default {
       this.currentlyEditedTask = id;
     },
     onSaveTask: function(id, event) {
-      const task = this.getTaskById(id);
+      api.updateTask(id, event.currentTarget.value)
+          .then((result) => {
+            this.stopTaskEdition();
+            this.loadTasks();
+          });
 
-      if( task && event ) {
-        task.title = event.currentTarget.value;
-      }
-
-      this.stopTaskEdition();
     },
     onDeleteTask: function( id ) {
       if(confirm("Continue deleting the task?")) {
-        this.tasks = this.tasks.filter(task => task.id !== id);
+        api.deleteTask(id).then((result) => {
+          if(result){
+            this.loadTasks();
+          }
+        });
       }
-    },
-    getNewId: function() {
-      let result = null;
-
-      for(let i = 0; i < this.tasks.length; ++i) {
-        let task = this.tasks[i];
-        if( result === null || task.id > result ) {
-          result = task.id;
-        }
-      }
-
-      return result === null ? 1 : result + 1 ;
     },
     loadTasks: function() {
-      let self = this;
-      axios.get('/api/tasks').then(function(response){
-        console.log(response);
-
-        if(response.status === 200 && response.data) {
-          self.tasks = response.data['hydra:member'];
-        }
-
-      }).catch(function(error){
-        console.log(error);
-      })
+      api.findTasks().then(tasks => this.tasks = tasks);
     },
     onEnterTask: function(event) {
       if( event ) {
-        /* this.tasks.push({
-          id: this.getNewId(),
-          title: event.currentTarget.value
-        }); */
-
-        let self = this;
-
-        axios.post('/api/tasks', {
-          title: event.currentTarget.value
-        }).then(function(response){
-          if(response.status === 201){
-            self.loadTasks();
-          }
-        }).catch(function(error){
-          console.log(error);
+        let input = event.currentTarget;
+        api.addTask(input.value).then(() => {
+          this.loadTasks();
+          input.value = "";
         });
-
-        event.currentTarget.value = "";
       }
     }
   }
