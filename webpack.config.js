@@ -58,6 +58,10 @@ Encore
     // enables Sass/SCSS support
     .enableSassLoader()
 
+    .addPlugin({
+        __VUE_OPTIONS_API__: false,
+        __VUE_PROD_DEVTOOLS__: false
+    })
     .enableVueLoader()
 
     // uncomment if you use TypeScript
