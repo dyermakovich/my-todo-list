@@ -11,8 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=TaskRepository::class)
  * @ApiResource(
- *     collectionOperations={"get","post"},
- *     itemOperations={"get","delete","put"}
+ *     collectionOperations={"get", "post"},
+ *     itemOperations={"get", "delete", "put", "move"},
+ *     order={"gravity"="ASC"},
+ *     paginationEnabled=false
  * )
  */
 class Task
@@ -43,6 +45,11 @@ class Task
      * @ORM\OneToMany(targetEntity=Task::class, mappedBy="parent")
      */
     private $subtasks;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $gravity;
 
     public function __construct()
     {
@@ -116,6 +123,18 @@ class Task
                 $subtask->setParent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getGravity(): ?int
+    {
+        return $this->gravity;
+    }
+
+    public function setGravity(?int $gravity): self
+    {
+        $this->gravity = $gravity;
 
         return $this;
     }

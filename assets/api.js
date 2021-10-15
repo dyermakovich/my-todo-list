@@ -17,11 +17,10 @@ function getPathNormalized(path){
 };
 
 function fetchCollection(path) {
-    return axios.get(baseUrl + getPathNormalized(path))
+    return axios.get(baseUrl + getPathNormalized(path) + '.json' )
         .then(response => {
-            debugger;
-            if (response.status === 200 && response.data && response.data['hydra:member'] ) {
-                return response.data['hydra:member'];
+            if (response.status === 200 && response.data ) {
+                return response.data;
             }
             return [];
         }).catch(error => {
@@ -73,8 +72,12 @@ export default {
     findTasks() {
         return fetchCollection('tasks');
     },
-    addTask(title, description = null ) {
-        return addEntity('tasks', {title: title, description: description});
+    addTask(gravity, title, description = null ) {
+        return addEntity('tasks', {
+            gravity: gravity,
+            title: title,
+            description: description
+        });
     },
     deleteTask(id) {
         return deleteEntity('tasks', id);
@@ -83,6 +86,18 @@ export default {
         return updateEntity('tasks', id, {
             title: title, description: description
         });
+    },
+    moveTask(fromId, toId) {
+        return axios.get(`${baseUrl}/tasks/move/${fromId}/${toId}`)
+            .then(response => {
+                if(response.status === 200) {
+                    return true;
+                }
+                return false;
+            }).catch(error => {
+                onErrorResponse(error);
+                return false;
+            });
     }
 }
 

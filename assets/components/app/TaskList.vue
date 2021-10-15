@@ -36,7 +36,8 @@ export default {
   },
   computed: {
     sortedTasks() {
-      return this.tasks.sort((a, b) => {
+      return this.tasks;
+      /* return this.tasks.sort((a, b) => {
         if(a.order === undefined) {
           a.order = a.id;
         }
@@ -47,10 +48,11 @@ export default {
           return -1;
         }
         if(a.order > b.order) {
-          return 1;
+          return 1
+              ;
         }
         return 0;
-      });
+      }); */
     }
   },
   mounted() {
@@ -60,10 +62,32 @@ export default {
     getTaskById: function(id) {
       return this.tasks.find(task => task.id === id);
     },
-    getTaskByOrder: function(order) {
-      return this.tasks.find(task => task.order === order);
+    getTaskByIndex: function(index) {
+      if(index < 0 || index >= this.tasks.length) {
+        return null;
+      }
+      return this.tasks[index];
     },
+    getTaskIndex: function(task) {
+      return this.tasks.indexOf(task);
+    },
+    /* getTaskByOrder: function(order) {
+      return this.tasks.find(task => task.order === order);
+    }, */
     moveTask: function(id, down = true) {
+      const task1 = this.getTaskById(id);
+      const index1 = this.getTaskIndex(task1);
+      const index2 = index1 + ( down ? 1 : -1 );
+      const task2 = this.getTaskByIndex(index2);
+
+      if(task1 && task2){
+        const aux = this.tasks[index2];
+        this.tasks[index2] = this.tasks[index1];
+        this.tasks[index1] = aux;
+        api.moveTask(task1.id, task2.id).then(()=> this.loadTasks());
+      }
+    },
+    /* moveTask: function(id, down = true) {
       const task = this.getTaskById(id);
 
       if(task){
@@ -76,7 +100,7 @@ export default {
           task.order = aux;
         }
       }
-    },
+    }, */
     stopTaskEdition: function() {
       this.currentlyEditedTask = null;
     },
@@ -103,10 +127,15 @@ export default {
     loadTasks: function() {
       api.findTasks().then(tasks => this.tasks = tasks);
     },
+    getNextGravity: function(){
+      return this.tasks.reduce((pv, cv) => {
+        return Math.max(pv, cv.gravity);
+      }, 0) + 1;
+    },
     onEnterTask: function(event) {
       if( event ) {
         let input = event.currentTarget;
-        api.addTask(input.value).then(() => {
+        api.addTask(this.getNextGravity(), input.value).then(() => {
           this.loadTasks();
           input.value = "";
         });
