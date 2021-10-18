@@ -21,10 +21,10 @@ class TaskController extends AbstractController
         $this->logger = $logger;
     }
 
-    #[Route('/', name: 'homepage')]
+    #[Route('/', name: 'app_homepage')]
     public function index(): Response
     {
-        return $this->render('base.html.twig' );
+        return $this->render('/task/index.html.twig' );
     }
 
     protected function createTaskNotFoundException($id): NotFoundHttpException {

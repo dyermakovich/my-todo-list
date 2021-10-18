@@ -12,8 +12,25 @@
         {% endblock %}
     </head>
     <body>
-        {% block body %}
-            <div id="app"></div>
-        {% endblock %}
+        <!-- Navigation-->
+        <nav class="navbar navbar-light bg-dark static-top">
+            <div class="container">
+                <div>
+                    <a class="navbar-brand text-white" href="{{ path('app_homepage') }}">MyTodoList.com</a>
+                </div>
+                <div>
+                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                        <a class="btn btn-primary" href="{{ path('app_logout') }}">Logout</a>
+                    {% else %}
+                        <a class="btn btn-primary" href="{{ path('app_register') }}">Sign up</a>
+                        <a class="btn btn-primary" href="{{ path('app_login') }}">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+        <div class="container" style="padding-top: 2em;">
+            {% block body %}
+            {% endblock %}
+        </div>
     </body>
 </html>
