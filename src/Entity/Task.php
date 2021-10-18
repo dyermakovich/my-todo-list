@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=TaskRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  * @ApiResource(
  *     collectionOperations={"get", "post"},
  *     itemOperations={"get", "delete", "put", "move"},
@@ -37,23 +38,24 @@ class Task
     private $description;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Task::class, inversedBy="subtasks")
+     * @ORM\ManyToOne(targetEntity=Task::class)
      */
     private $parent;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Task::class, mappedBy="parent")
-     */
-    private $subtasks;
 
     /**
      * @ORM\Column(type="integer")
      */
     private $gravity;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class)
+     */
+    private $createdBy;
+
+    private $security;
+
     public function __construct()
     {
-        $this->subtasks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -97,36 +99,6 @@ class Task
         return $this;
     }
 
-    /**
-     * @return Collection|self[]
-     */
-    public function getSubtasks(): Collection
-    {
-        return $this->subtasks;
-    }
-
-    public function addSubtask(self $subtask): self
-    {
-        if (!$this->subtasks->contains($subtask)) {
-            $this->subtasks[] = $subtask;
-            $subtask->setParent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSubtask(self $subtask): self
-    {
-        if ($this->subtasks->removeElement($subtask)) {
-            // set the owning side to null (unless already changed)
-            if ($subtask->getParent() === $this) {
-                $subtask->setParent(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getGravity(): ?int
     {
         return $this->gravity;
@@ -135,6 +107,18 @@ class Task
     public function setGravity(?int $gravity): self
     {
         $this->gravity = $gravity;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): self
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }
