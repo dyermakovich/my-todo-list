@@ -20,6 +20,7 @@
                 </div>
                 <div>
                     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                        <a class="btn btn-primary" href="{{ path('app_profile') }}">Profile</a>
                         <a class="btn btn-primary" href="{{ path('app_logout') }}">Logout</a>
                     {% else %}
                         <a class="btn btn-primary" href="{{ path('app_register') }}">Sign up</a>
